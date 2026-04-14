@@ -19,7 +19,20 @@ export default function StepVisualizer({
 }) {
   const [frameIndex, setFrameIndex] = useState(-1);  // -1 = show final result, >=0 = playing
   const [isPlaying, setIsPlaying] = useState(false);
+  const [delayedShowCheckLang, setDelayedShowCheckLang] = useState(false);
   const timerRef = useRef(null);
+
+  // ── Delay "Check Language" button at Step 4 ──
+  useEffect(() => {
+    if (stepResult?.stepNumber === 4) {
+      setDelayedShowCheckLang(false);
+      const t = setTimeout(() => setDelayedShowCheckLang(true), 2500);
+      return () => clearTimeout(t);
+    } else {
+      setDelayedShowCheckLang(false);
+    }
+  }, [stepResult?.stepNumber]);
+
 
   // ── Build unified frame timeline ──
   const frames = useMemo(() => {
@@ -322,9 +335,9 @@ export default function StepVisualizer({
                     Next Step →
                  </button>
               </div>
-            ) : showCheckButton ? (
-              <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'flex-end' }}>
-                 <button className="btn-primary sidebar-action-btn btn-check-lang-sidebar animate-in" onClick={() => {
+            ) : delayedShowCheckLang ? (
+              <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'flex-end', animation: 'fadeIn 0.5s ease' }}>
+                 <button className="btn-primary sidebar-action-btn btn-check-lang-sidebar" onClick={() => {
                    const input = document.querySelector('.recognizer-input');
                    if (input) {
                      input.focus();
